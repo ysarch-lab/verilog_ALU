@@ -1,3 +1,4 @@
+// Simulation module
 module sim;
 
   reg reset = 1'b1;
@@ -12,10 +13,10 @@ module sim;
 
   reg clk = 1'b0;
 
-  always begin
-    #5 clk <= ~clk;
-  end
+  // 10 time units per cycle
+  always #5 clk <= ~clk;
 
+  // Connecting wires
   wire [31:0] alu_a;
   wire [31:0] alu_b;
   wire  [1:0] alu_cmd;
@@ -24,6 +25,7 @@ module sim;
   wire        alu_res_valid;
   wire        alu_ready;
 
+  // ALU module
   alu my_alu
   (
     .clk(clk),
@@ -38,6 +40,7 @@ module sim;
     .o_ready(alu_ready)
   );
 
+  // ALU test module
   alu_test my_test
   (
     .i_alu_ready(alu_ready),
