@@ -1,6 +1,6 @@
 `include "alu.v"
 
-module alu_test(
+module alu_test#(parameter TESTS=32)(
   input i_alu_ready,
   input i_alu_res_valid,
   input [31:0] i_alu_result,
@@ -9,14 +9,13 @@ module alu_test(
   output [31:0] o_alu_b,
   output  [1:0] o_alu_op
 );
-`define TESTS 32
 
-reg [32+32-1:0] tests [0:`TESTS-1];
+reg [32+32-1:0] tests [0:TESTS-1];
 
 integer i;
 
 initial begin
-  for(i = 0; i < `TESTS; i = i + 1) begin
+  for(i = 0; i < TESTS; i = i + 1) begin
     tests[i] = {{$random},{$random}};
   end
 end
@@ -41,7 +40,7 @@ always @(posedge i_alu_ready) begin
    b <= tests[t][31:0];
    op <= `OP_ADD;
    res <= tests[t][63:32] + tests[t][31:0];
-   if (t + 1 < `TESTS) 
+   if (t + 1 < TESTS)
      t = t + 1;
    else
      t = 0;
