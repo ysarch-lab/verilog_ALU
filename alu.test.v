@@ -1,17 +1,23 @@
 `include "alu.v"
 
-module alu_test#(parameter TESTS=32)(
-  input i_alu_ready,
-  input i_alu_res_valid,
-  input [31:0] i_alu_result,
+module test#(parameter TESTS=32)(
+  input clk,
+  input reset,
 
-  output [31:0] o_alu_a,
-  output [31:0] o_alu_b,
-  output  [1:0] o_alu_op
+  output o_done
 );
+// Connecting wires
+wire [31:0] alu_a;
+wire [31:0] alu_b;
+wire  [1:0] alu_cmd;
+
+wire [31:0] alu_result;
+wire        alu_res_valid;
+wire        alu_ready;
 
 // You can use arrays (even multidimensional
 reg [32+32-1:0] tests [0:TESTS-1];
+reg done = 1'b0;
 
 // This is not synthetizable
 integer i;
@@ -29,25 +35,44 @@ reg [31:0] t = 5'h0;
 reg [31:0] a,b,res;
 reg [1:0] op = `OP_NOP;
 
-assign o_alu_a  = a;
-assign o_alu_b  = b;
-assign o_alu_op = op;
+assign alu_a   = a;
+assign alu_b   = b;
+assign alu_cmd = op;
+assign o_done  = done;
 
 
-always @(posedge i_alu_res_valid) begin
-  if (i_alu_result != res)
+always @(posedge alu_res_valid) begin
+  if (alu_result != res)
     $display("Result wrong!");
 end
 
-always @(posedge i_alu_ready) begin
+always @(posedge alu_ready) begin
    a <= tests[t][63:32];
    b <= tests[t][31:0];
    op <= `OP_ADD;
    res <= tests[t][63:32] + tests[t][31:0];
    if (t + 1 < TESTS)
      t = t + 1;
-   else
+   else begin
      t = 0;
+     done = 1'b1;
+   end
 end
+
+
+// ALU module
+alu my_alu
+(
+.clk(clk),
+.reset(reset),
+
+.i_a(alu_a),
+.i_b(alu_b),
+.i_cmd(alu_cmd),
+
+.o_result(alu_result),
+.o_valid(alu_res_valid),
+.o_ready(alu_ready)
+);
 
 endmodule
