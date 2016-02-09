@@ -10,13 +10,17 @@ module alu_test#(parameter TESTS=32)(
   output  [1:0] o_alu_op
 );
 
+// You can use arrays (even multidimensional
 reg [32+32-1:0] tests [0:TESTS-1];
 
+// This is not synthetizable
 integer i;
 
+
+// Initial block
 initial begin
   for(i = 0; i < TESTS; i = i + 1) begin
-    tests[i] = {{$random},{$random}};
+    tests[i] <= {{$random},{$random}};
   end
 end
 
@@ -30,7 +34,7 @@ assign o_alu_b  = b;
 assign o_alu_op = op;
 
 
-always @(posedge i_alu_res_valid && i_alu_ready) begin
+always @(posedge i_alu_res_valid) begin
   if (i_alu_result != res)
     $display("Result wrong!");
 end
@@ -47,4 +51,3 @@ always @(posedge i_alu_ready) begin
 end
 
 endmodule
-`include "sim.v"
