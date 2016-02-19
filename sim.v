@@ -1,3 +1,5 @@
+`ifndef ALU_V
+`define ALU_V
 // Simulation module
 module sim;
 
@@ -24,3 +26,4 @@ module sim;
   );
 
 endmodule
+`endif
