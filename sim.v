@@ -1,5 +1,5 @@
-`ifndef ALU_V
-`define ALU_V
+`ifndef SIM_V
+`define SIM_V
 // Simulation module
 module sim;
 
