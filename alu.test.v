@@ -1,11 +1,15 @@
 `include "alu.v"
+`include "sim.v"
 
-module test#(parameter TESTS=32)(
-  input clk,
-  input reset,
+`ifndef TESTS
+`define TESTS 32
+`endif
 
-  output o_done
-);
+module test();
+
+wire reset;
+wire clk;
+
 // Connecting wires
 wire [31:0] alu_a;
 wire [31:0] alu_b;
@@ -16,16 +20,15 @@ wire        alu_res_valid;
 wire        alu_ready;
 
 // You can use arrays (even multidimensional
-reg [32+32-1:0] tests [0:TESTS-1];
+reg [32+32-1:0] tests [0:`TESTS-1];
 reg done = 1'b0;
 
 // This is not synthetizable
 integer i;
 
-
 // Initial block
 initial begin
-  for(i = 0; i < TESTS; i = i + 1) begin
+  for(i = 0; i < `TESTS; i = i + 1) begin
     tests[i] <= {{$random},{$random}};
   end
 end
@@ -38,7 +41,6 @@ reg [1:0] op = `OP_NOP;
 assign alu_a   = a;
 assign alu_b   = b;
 assign alu_cmd = op;
-assign o_done  = done;
 
 
 always @(posedge alu_res_valid) begin
@@ -51,9 +53,10 @@ always @(posedge alu_ready) begin
    b <= tests[t][31:0];
    op <= `OP_ADD;
    res <= tests[t][63:32] + tests[t][31:0];
-   if (t + 1 < TESTS)
+   if (t + 1 < `TESTS)
      t = t + 1;
    else begin
+     //finish here?
      t = 0;
      done = 1'b1;
    end
@@ -63,16 +66,22 @@ end
 // ALU module
 alu my_alu
 (
-.clk(clk),
-.reset(reset),
+  .clk(clk),
+  .reset(reset),
 
-.i_a(alu_a),
-.i_b(alu_b),
-.i_cmd(alu_cmd),
+  .i_a(alu_a),
+  .i_b(alu_b),
+  .i_cmd(alu_cmd),
 
-.o_result(alu_result),
-.o_valid(alu_res_valid),
-.o_ready(alu_ready)
+  .o_result(alu_result),
+  .o_valid(alu_res_valid),
+  .o_ready(alu_ready)
+);
+
+// Simulator (clock + reset)
+sim my_sim(
+  .clk(clk),
+  .reset(reset)
 );
 
 endmodule
