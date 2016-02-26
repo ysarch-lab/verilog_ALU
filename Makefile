@@ -1,24 +1,30 @@
-BINS=alu.test.run
+TESTS=$(shell find . -maxdepth 1 -name '*.test.v')
+BINS=$(TESTS:.v=.run)
+
+VFLAGS=-g 2009 -Wall
+
 
 all: $(BINS)
 
 %.run: %.v
-	iverilog -g 2009 -Wall $< -o $@
+	iverilog $(VFLAGS) $< -o $@
 
 clean:
-	rm -v *.run Makefile.deps
+	rm -fv *.run Makefile.deps
 
 
 .INTERMEDIATE: $(BINS:.run=.v.dep)
 %.v.dep: %.v
 	$(eval TMPF=$(shell mktemp))
-	iverilog -Minclude=$(TMPF) $< -o /dev/null
+	iverilog $(VFLAGS) -Minclude=$(TMPF) $< -o /dev/null
 	sed -i -e "1i $@:" -e 's/\.v\.dep:/.run:/' $(TMPF)
 	paste -sd ' ' $(TMPF) > $@
 	paste -sd ' ' $(TMPF) | sed -e 's/\.v\.dep:/.run:/' >> $@
 	rm -f $(TMPF)
 
 Makefile.deps: $(BINS:.run=.v.dep)
-	cat $^ > $@
+	cat $^ /dev/null > $@
 
+ifneq ($(BINS),)
 include Makefile.deps
+endif
