@@ -3,7 +3,7 @@ BINS=alu.test.run
 all: $(BINS)
 
 %.run: %.v sim.v
-	iverilog -g 2005 -Wall $^ -o $@
+	iverilog -g 2009 -Wall $^ -o $@
 
 clean:
 	rm -v *.run Makefile.deps
