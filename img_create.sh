@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 if [ "x$1" == "x" ]; then
 	echo "Please provide an argument or two"
 	return 1;
@@ -15,4 +15,5 @@ TMPFILE=`mktemp`
 echo "Converting $1 to $TARGET"
 
 objcopy -j.text -O binary "$1" "$TMPFILE"
-hexdump -v -e '"0x%08x\n"' "$TMPFILE" > "$TARGET"
+readelf -h "$1" | grep "Entry point address:"| awk '{printf "0x%08x\n", strtonum($NF)}' > "$TARGET"
+hexdump -v -e '"0x%08x\n"' "$TMPFILE" >> "$TARGET"
